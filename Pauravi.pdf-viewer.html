@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pauravi - PDF Viewer</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <div class="branding">
+      <img src="assets/rama rachna.png" alt="Rama Rachna Logo" />
+      <h1 data-en="Rama Rachna" data-gu="રમા રચના">Rama Rachna</h1>
+    </div>
+    <div class="toggle-switch">
+      <input type="checkbox" id="lang-toggle">
+      <label for="lang-toggle" class="toggle-slider"></label>
+    </div>
+  </header>
+
+  <nav>
+    <a href="index.html" class="nav-item" data-en="Home" data-gu="હોમ">Home</a>
+    <a href="author-pub.html" class="nav-item" data-en="Publications" data-gu="પ્રકાશનો અનુક્રમણિકા">Publications</a>
+    <a href="about.html" class="nav-item" data-en="About" data-gu="વિશે">About</a>
+    <a href="photo-gallery.html" class="nav-item" data-en="Gallery" data-gu="ગેલેરી">Gallery</a>
+  </nav>
+
+  <main style="padding: 15vh 1rem 2rem;">
+    <section style="text-align: center;">
+      <h2 style="margin-bottom: 1rem;">📖 Pauravi by Rama Harshad Shah</h2>
+      <iframe src="assets/Pauravi.pdf" width="100%" height="600px" style="border: none; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: #fff;"></iframe>
+    </section>
+  </main>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
