@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog Admin - Rama Rachna</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main>
+    <section class="admin-box">
+      <h2>Blog Admin Dashboard</h2>
+      <p>Welcome, <strong id="admin-name"></strong> 👋</p> <br>
+      <div><button onclick="logout()">Logout</button> <br></div>
+      <br>
+      <hr>
+
+      <!-- Post Selector & New Post Button -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <label for="post-selector"><strong>📚 Select Post:</strong></label>
+          <select id="post-selector" onchange="switchPost(this.value)">
+            <option disabled selected>Loading...</option>
+          </select>
+        </div>
+        <button onclick="togglePostForm()" style="background:#7D615B; color:white; border:none; padding:0.5rem 1rem; border-radius:5px;">➕ New Post</button>
+      </div>
+
+      <!-- New Post Form -->
+      <div id="new-post-form" style="display: none; margin-bottom: 2rem; border: 1px solid #ccc; padding: 1rem; border-radius: 6px;">
+        <h3>Create New Post</h3>
+        <input id="new-title" type="text" placeholder="Title" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;" />
+        <textarea id="new-body" rows="4" placeholder="Body" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;"></textarea>
+        <input id="new-author" type="text" placeholder="Author" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;" value="Rama Harshad Shah" />
+        <button onclick="submitNewPost()" style="padding: 0.5rem 1rem; background: green; color: white; border: none;">Submit Post</button>
+      </div>
+
+      <div id="post-details" style="margin-bottom: 2rem;"></div>
+
+      <h3>💬 Comments</h3>
+      <div id="comments-section">Loading...</div>
+    </section>
+  </main>
+
+  <script>
+    document.body.style.opacity = '1';
+    if (localStorage.getItem('isAdmin') !== 'true') {
+      alert("Access denied.");
+      window.location.href = "index.html";
+    }
+
+    document.getElementById('admin-name').textContent = localStorage.getItem('username') || 'Admin';
+
+    let currentPostId = null;
+    let allPosts = [];
+
+    function togglePostForm() {
+      const form = document.getElementById('new-post-form');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function loadPosts() {
+      const res = await fetch('http://localhost:3000/api/posts');
+      allPosts = await res.json();
+
+      const selector = document.getElementById('post-selector');
+      selector.innerHTML = '';
+
+      allPosts.forEach(post => {
+        const opt = document.createElement('option');
+        opt.value = post._id;
+        opt.textContent = post.title;
+        selector.appendChild(opt);
+      });
+
+      currentPostId = allPosts[0]._id;
+      selector.value = currentPostId;
+      renderPostContent(currentPostId);
+      loadComments(currentPostId);
+    }
+
+    function switchPost(postId) {
+      currentPostId = postId;
+      renderPostContent(postId);
+      loadComments(postId);
+    }
+
+    function renderPostContent(postId) {
+      const post = allPosts.find(p => p._id === postId);
+      const postDisplay = document.getElementById('post-details');
+      postDisplay.innerHTML = `
+        <h3 style="margin-bottom:0.5rem;">${post.title}</h3>
+        <p>${post.body}</p>
+        <hr />
+      `;
+    }
+
+    async function loadComments(postId) {
+      const resComments = await fetch('http://localhost:3000/api/comments/' + postId);
+      const comments = await resComments.json();
+
+      const section = document.getElementById('comments-section');
+      section.innerHTML = '';
+
+      if (comments.length === 0) {
+        section.innerHTML = '<p>No comments yet.</p>';
+        return;
+      }
+
+      // Group by parentId
+      const commentMap = {};
+      comments.forEach(comment => {
+        const pid = comment.parentId || 'root';
+        if (!commentMap[pid]) commentMap[pid] = [];
+        commentMap[pid].push(comment);
+      });
+
+      // Recursive render
+      function renderComments(parentId = 'root', depth = 0) {
+        const group = commentMap[parentId] || [];
+        group.forEach(comment => {
+          const div = document.createElement('div');
+          div.className = 'comment-item';
+          div.style.marginLeft = `${depth * 2}rem`;
+          div.innerHTML = `
+            <p><strong>${comment.isAuthor ? 'Author ⭐' : comment.name}:</strong> ${comment.text}</p>
+            <div class="comment-actions">
+              <button onclick="reply('${comment._id}')">Reply</button>
+              <button onclick="deleteComment('${comment._id}')">Delete</button>
+            </div>
+            <div class="reply-box" id="reply-box-${comment._id}"></div>
+          `;
+          section.appendChild(div);
+          renderComments(comment._id, depth + 1);
+        });
+      }
+
+      renderComments();
+    }
+
+    function reply(commentId) {
+      const box = document.getElementById(`reply-box-${commentId}`);
+      if (box.innerHTML !== '') return;
+
+      box.innerHTML = `
+        <textarea rows="2" style="width:100%; margin-top:10px;" placeholder="Author reply..."></textarea>
+        <button onclick="postAdminReply('${commentId}', this)">Post Reply</button>
+      `;
+    }
+
+    async function postAdminReply(parentId, button) {
+      const textarea = button.previousElementSibling;
+      const text = textarea.value.trim();
+      if (!text) return alert("Reply cannot be empty");
+
+      const payload = {
+        postId: currentPostId,
+        parentId,
+        name: "Author",
+        email: "admin@rama.com",
+        text,
+        isAuthor: true
+      };
+
+      try {
+        const res = await fetch('http://localhost:3000/api/comments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          alert("✅ Reply posted");
+          loadComments(currentPostId);
+        } else {
+          alert("❌ Failed to post reply");
+        }
+      } catch (err) {
+        console.error("🔥 Error posting reply:", err);
+        alert("❌ Server error");
+      }
+    }
+
+    function deleteComment(id) {
+      fetch('http://localhost:3000/api/comments/' + id, { method: 'DELETE' })
+        .then(() => {
+          alert("🗑️ Deleted");
+          loadComments(currentPostId);
+        })
+        .catch(err => {
+          console.error("❌ Delete error:", err);
+          alert("Error deleting comment");
+        });
+    }
+
+    async function submitNewPost() {
+      const title = document.getElementById('new-title').value.trim();
+      const body = document.getElementById('new-body').value.trim();
+      const author = document.getElementById('new-author').value.trim();
+
+      if (!title || !body || !author) {
+        return alert("All fields are required.");
+      }
+
+      try {
+        const res = await fetch('http://localhost:3000/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, body, author })
+        });
+
+        if (res.ok) {
+          alert("✅ New post created!");
+          document.getElementById('new-post-form').style.display = 'none';
+          loadPosts(); // Refresh everything
+        } else {
+          const err = await res.json();
+          alert("❌ Failed to create post: " + (err.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error("🔥 Post creation failed:", error);
+        alert("❌ Server error");
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('isAdmin');
+      localStorage.removeItem('username');
+      window.location.href = "index.html";
+    }
+
+    // Init
+    loadPosts();
+  </script>
+</body>
+</html>

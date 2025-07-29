@@ -1,0 +1,125 @@
+<!-- author-pub.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rama Rachna - Publications</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <header>
+  <div class="branding">
+    <img src="assets/rama rachna.png" alt="Rama Rachna Logo">
+    <h1 data-en="Rama Rachna" data-gu="રમા રચના">Rama Rachna</h1>
+  </div>
+  <div class="toggle-switch">
+    <input type="checkbox" id="lang-toggle">
+    <label for="lang-toggle" class="toggle-slider"></label>
+  </div>
+</header>
+  <nav>
+    <a href="index.html" class="nav-item" data-en="Home" data-gu="હોમ">Home</a>
+    <a href="author-pub.html" class="nav-item" data-en="Publications" data-gu="પ્રકાશનો અનુક્રમણિકા">Publications</a>
+    <a href="about.html" class="nav-item" data-en="About" data-gu="વિશે">About</a>
+    <a href="photo-gallery.html" class="nav-item" data-en="Gallery" data-gu="ગેલેરી">Gallery</a>
+    <a href="blog.html" class="nav-item" data-en="Blog" data-gu="બ્લોગ">Blog</a>
+  </nav>
+  <main>
+    <section>
+      <h2 data-en="Publications" data-gu="પ્રકાશનો અનુક્રમણિકા">Publications</h2> <br>
+    </section>
+  </body>
+  
+    <!-- Infobox vcard -->
+    <table class="infobox vcard" style="float:right; margin:1em; width:280px; font-size:0.9rem; border:1px solid #aaa; background:#f9f9f9;">
+      <tbody>
+        <!-- Types label + data -->
+        <tr>
+          <th colspan="2" class="infobox-above fn" data-en="Types" data-gu="પ્રકાર">Types</th>
+        </tr>
+        <tr>
+          <td class="infobox-label" style="vertical-align:top; padding:0.4em;" data-en="—" data-gu="—"></td>
+          <td class="infobox-data" style="padding:0.4em;">
+            <ul style="list-style:disc inside; margin:0; padding-left:0;">
+              <li>
+                <strong data-en="Prose" data-gu="ગદ્ય">Prose</strong><br>
+                <span data-en="Written or spoken language in its ordinary form, without metrical structure."
+                      data-gu="માપદંડ વગર લેખાયેલ કે બોલાયેલ સામાન્ય ભાષા.">
+                  Written or spoken language in its ordinary form, without metrical structure.
+                </span>
+              </li>
+              <li>
+                <strong data-en="Poetry" data-gu="કાવ્ય">Poetry</strong><br>
+                <span data-en="Literary work in which the expression of feelings is given intensity by the use of distinctive style and rhythm."
+                      data-gu="અવ્યક્ત ભાવોને છંદ અને શૈલીમાં પ્રગટાવતી સાહિત્યિક રચના.">
+                  Literary work in which the expression of feelings is given intensity by the use of distinctive style and rhythm.
+                </span>
+              </li>
+              <li>
+                <strong data-en="Haiku" data-gu="હાઈકુ">Haiku</strong><br>
+                <span data-en="A Japanese three-line poem with a 5-7-5 syllable pattern, often evoking nature."
+                      data-gu="જાપાનીઝ ત્રણ લીટીવાળો કવિતા—5-7-5 સેવા, પ્રકૃતિની છબી.">
+                  A Japanese three-line poem with a 5-7-5 syllable pattern, often evoking nature.
+                </span>
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <!-- Award image & caption -->
+        <tr>
+          <td colspan="2" style="padding:0.4em; text-align:center;">
+            <img src="assets/gallery/IMG-20250709-WA0004.jpg" alt="Limca Record Award" style="width:100%; border:1px solid #ccc;">
+            <div class="infobox-caption" style="font-size:0.8rem; color:#555; margin-top:0.3em;"
+                 data-en="Rama Shah was awarded the Limca Book of World Records in the year 2013."
+                 data-gu="રમા શાહને Limca વર્લ્ડ રેકોર્ડ બુકમાં વર્ષ 2013માં નોંધવામાં આવી.">
+              Rama Shah was awarded the Limca Book of World Records in the year 2013.
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Main content sections -->
+    <section>
+      <body>
+      <h3 data-en="Prose" data-gu="ગદ્ય">Prose</h3>
+      <hr>
+      <p data-en="Here you can write a detailed overview of Rama Shah’s work in prose—novels, essays, and other narrative forms."
+         data-gu="અહીં તમે રમા શાહના ગદ્યકાર્ય—ઉપન્યાસો, નિબંધો અને અન્ય વાર્તાકથાઓ—નું વિસ્તૃત સારાંશ લખી શકો છો.">
+        Here you can write a detailed overview of Rama Shah’s work in prose—novels, essays, and other narrative forms. <br>
+      </p>
+      <div id="prose-book-grid" class="book-grid"></div>
+      <br>
+      <h3 data-en="Poetry" data-gu="કાવ્ય">Poetry</h3>
+      <hr>
+      <p data-en="Detail Rama Shah’s poetry collections, themes, and notable verses here."
+         data-gu="અહીં રમા શાહના કાવ્યો, વિષયો અને પ્રખ્યાત પદ્યોનું વર્ણન કરો.">
+        Detail Rama Shah’s poetry collections, themes, and notable verses here. <br>
+      </p>
+      <div id="poetry-book-grid" class="book-grid"></div>
+      <br>
+      <h3 data-en="Haiku" data-gu="હાઈકુ">Haiku</h3>
+      <hr>
+      <p data-en="Describe any haiku collections or individual haiku Rama Shah has published."
+         data-gu="રમા શાહ દ્વારા પ્રકાશિત હાઈકુ સંગ્રહો અથવા એકલ હાઈકુનું વર્ણન કરો.">
+        Describe any haiku collections or individual haiku Rama Shah has published. <br>
+      </p>
+      <div id="haiku-book-grid" class="book-grid"></div>
+      <br>
+
+      <h3 data-en="Awards and Recognition" data-gu="પુરસ્કાર અને માન્યતા">Awards and Recognition</h3>
+      <hr>
+      <p data-en="Rama Shah has received numerous accolades for her literary contributions, including the prestigious Limca Book of World Records in 2013 for her exceptional work in prose and poetry."
+         data-gu="રમા શાહને તેમના સાહિત્યિક યોગદાન માટે અનેક પુરસ્કારો મળ્યા છે, જેમાં 2013માં ગદ્ય અને કાવ્યમાં તેમના અસાધારણ કાર્ય માટે પ્રખ્યાત Limca બુક ઓફ વર્લ્ડ રેકોર્ડ્સનો સમાવેશ થાય છે.">
+        Rama Shah has received numerous accolades for her literary contributions, including the prestigious Limca Book of World Records in 2013 for her exceptional work in prose and poetry.
+      </p>
+      <div id="press-book-grid" class="book-grid"></div>
+      <br>
+    </section>
+  </main>
+  <script src="js/app.js"></script>
+</body>
+</html>
+
