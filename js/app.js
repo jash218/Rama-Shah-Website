@@ -1,33 +1,34 @@
 // js/app.js
+
 window.addEventListener('DOMContentLoaded', () => {
-  // Fade in page
+  // Fade-in effect
   document.body.style.opacity = '1';
 
+  // Language toggle setup
   const toggle = document.getElementById('lang-toggle');
-  const savedLang = localStorage.getItem('lang') || 'en';
+  if (toggle) {
+    const savedLang = localStorage.getItem('lang') || 'en';
+    toggle.checked = savedLang === 'gu';
+    switchLanguage(savedLang);
 
-  // Set toggle switch based on saved language
-  toggle.checked = savedLang === 'gu';
-  switchLanguage(savedLang);
-
-  // Toggle change listener
-  toggle.addEventListener('change', () => {
-    const lang = toggle.checked ? 'gu' : 'en';
-    localStorage.setItem('lang', lang);
-    switchLanguage(lang);
-  });
+    toggle.addEventListener('change', () => {
+      const lang = toggle.checked ? 'gu' : 'en';
+      localStorage.setItem('lang', lang);
+      switchLanguage(lang);
+    });
+  }
 
   function switchLanguage(lang) {
     document.querySelectorAll('[data-en]').forEach(el => {
       el.style.opacity = '0';
       setTimeout(() => {
-        el.textContent = el.dataset[lang];
+        el.textContent = el.dataset[lang] || el.dataset.en;
         el.style.opacity = '1';
       }, 200);
     });
   }
 
-  // Page transition effect
+  // Smooth page transitions for nav links
   document.querySelectorAll('nav a').forEach(link => {
     link.addEventListener('click', e => {
       e.preventDefault();
@@ -36,97 +37,109 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Book grid for publications page
-  const bookGrid = document.getElementById('book-grid');
-  if (bookGrid) {
-    for (let i = 0; i < 32; i++) {
+  // —— Populate “Prose” cards with the shared cover image ——
+  const proseGrid = document.getElementById('prose-book-grid');
+  if (proseGrid) {
+    const files = [
+      '99 Pankaj.pdf',
+      '100 Prasadhan.pdf',
+      '101 Pravdhan.pdf'
+    ];
+
+    files.forEach(name => {
+      const a = document.createElement('a');
+      a.href   = `pdf-viewer.html?file=assets/pdfs/prose/${encodeURIComponent(name)}`;
+      a.target = '_blank';
+      a.style.display        = 'inline-block';
+      a.style.textAlign      = 'center';
+      a.style.textDecoration = 'none';
+      a.style.color          = 'inherit';
+      a.style.margin         = '0.5rem';
+
+      // Use the provided cover image for every PDF
       const img = document.createElement('img');
-      img.src = 'https://via.placeholder.com/150x200';
-      img.alt = 'Book Cover';
-      bookGrid.appendChild(img);
-    }
+      img.src = 'assets/covers/wab.jpg';
+      img.alt = name.replace('.pdf', '');
+      a.appendChild(img);
+
+      const cap = document.createElement('div');
+      cap.textContent = name.replace('.pdf','');
+      cap.style.marginTop = '0.5rem';
+      cap.style.fontSize  = '0.9rem';
+      a.appendChild(cap);
+
+      proseGrid.appendChild(a);
+    });
   }
 
-  document.getElementById('comment-form').addEventListener('submit', e => {
-  e.preventDefault();
-  const commentText = document.getElementById('comment-input').value.trim();
-  if (commentText === '') return;
+  // If you have Poetry, Haiku, etc. grids and want the same cover image:
+  ['poetry', 'haiku', 'press'].forEach(category => {
+    const grid = document.getElementById(`${category}-book-grid`);
+    if (grid) {
+      // You can replace this array with real filenames when ready
+      const files = ['Sample1.pdf', 'Sample2.pdf']; 
+      files.forEach(name => {
+        const a = document.createElement('a');
+        a.href   = `pdf-viewer.html?file=assets/pdfs/${category}/${encodeURIComponent(name)}`;
+        a.target = '_blank';
+        a.style.display   = 'inline-block';
+        a.style.textAlign = 'center';
+        a.style.margin    = '0.5rem';
 
-  const now = new Date();
-  const timestamp = now.toLocaleString();
+        const img = document.createElement('img');
+        img.src = 'assets/covers/White and Blue Geometric Business Book Cover.jpg';
+        img.alt = name.replace('.pdf','');
+        a.appendChild(img);
 
-  const commentBlock = document.createElement('div');
-  commentBlock.className = 'comment-thread';
-  commentBlock.innerHTML = `
-    <p><strong>You:</strong> ${commentText}</p>
-    <small style="color: #888;">Posted on ${timestamp}</small>
-    <br>
-    <button onclick="replyTo(this)">Reply</button>
-    <div class="replies"></div>
-  `;
+        const cap = document.createElement('div');
+        cap.textContent = name.replace('.pdf','');
+        cap.style.marginTop = '0.5rem';
+        cap.style.fontSize  = '0.9rem';
+        a.appendChild(cap);
 
-  document.getElementById('comments-section').appendChild(commentBlock);
-  document.getElementById('comment-input').value = '';
+        grid.appendChild(a);
+      });
+    }
+  });
+
+  // Comment form (guarded in case it's not on this page)
+  const form = document.getElementById('comment-form');
+  if (form) {
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const input = document.getElementById('comment-input');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      const now = new Date().toLocaleString();
+      const block = document.createElement('div');
+      block.className = 'comment-thread';
+      block.innerHTML = `
+        <p><strong>You:</strong> ${text}</p>
+        <small style="color:#888;">Posted on ${now}</small>
+        <br>
+        <button onclick="postReply(this)">Reply</button>
+        <div class="replies"></div>
+      `;
+      document.getElementById('comments-section')?.appendChild(block);
+      input.value = '';
+    });
+  }
 });
-  
-  function postReply(button) {
+
+// Reply handler (guarded)
+function postReply(button) {
   const replyBox = button.previousElementSibling;
-  const text = replyBox.value.trim();
+  if (!replyBox) return;
+  const text = replyBox.value?.trim();
   if (!text) return;
 
-  const now = new Date();
-  const timestamp = now.toLocaleString();
-
+  const now   = new Date().toLocaleString();
   const reply = document.createElement('div');
   reply.innerHTML = `
     <p><strong class="author-reply">Author ⭐:</strong> ${text}</p>
-    <small style="color: #888;">Replied on ${timestamp}</small>
+    <small style="color:#888;">Replied on ${now}</small>
   `;
   button.parentElement.replaceWith(reply);
 }
-});
-
-
-// Function to populate book grid for a specific category
-function populateBookGrid(category) {
-  const gridElement = document.getElementById(`${category}-book-grid`);
-  
-  if (!gridElement) return;
-
-  // Fetch PDF files for the specific category
-  fetch(`assets/pdfs/${category}`)
-    .then(response => response.json())
-    .then(files => {
-      files.forEach(file => {
-        const bookCard = document.createElement('div');
-        bookCard.className = 'book-card';
-        
-        const bookCover = document.createElement('img');
-        bookCover.src = 'path/to/default/book-cover.png'; // Add a default book cover
-        bookCover.alt = file.name;
-        
-        const bookTitle = document.createElement('p');
-        bookTitle.textContent = file.name.replace('.pdf', '');
-        
-        const downloadLink = document.createElement('a');
-        downloadLink.href = `assets/pdfs/${category}/${file.name}`;
-        downloadLink.textContent = 'Download PDF';
-        downloadLink.download = true;
-        
-        bookCard.appendChild(bookCover);
-        bookCard.appendChild(bookTitle);
-        bookCard.appendChild(downloadLink);
-        
-        gridElement.appendChild(bookCard);
-      });
-    })
-    .catch(error => console.error('Error loading PDFs:', error));
-}
-
-// Populate grids when page loads
-window.addEventListener('DOMContentLoaded', () => {
-  populateBookGrid('prose');
-  populateBookGrid('poetry');
-  populateBookGrid('haiku');
-  populateBookGrid('press');
-});

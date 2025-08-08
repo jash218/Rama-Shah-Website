@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rama Rachna - Blog</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/blogstyle.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>marked.setOptions({ breaks: true });</script>
   <style>
     :root {
       --header-height: 10vh;
@@ -105,6 +107,19 @@
     }
     .error { color: #b00; }
   </style>
+
+  <!-- Markdown spacing overrides -->
+  <style>
+    .post-markdown p {
+      margin: 1rem 0 !important;
+      line-height: 1.6 !important;
+    }
+    .post-markdown br {
+      display: block !important;
+      margin-bottom: 1rem !important;
+    }
+  </style>
+
 </head>
 <body>
   <header style="position:fixed;top:0;width:100%;height:var(--header-height);background:#FDF6E1;display:flex;align-items:center;justify-content:space-between;padding:0 1rem;border-bottom:1px solid #ccc;z-index:1000;">
@@ -112,10 +127,10 @@
       <img src="assets/rama rachna.png" alt="Rama Rachna Logo" style="height:40px;margin-right:10px;">
       <h1 style="color:#7D615B;">Rama Rachna</h1>
     </div>
-    <div class="toggle-switch">
+    <!--<div class="toggle-switch">
       <input type="checkbox" id="lang-toggle">
       <label for="lang-toggle" class="toggle-slider"></label>
-    </div>
+    </div> -->
   </header>
   <nav style="position:fixed;top:var(--header-height);width:100%;height:var(--nav-height);background:#F8EDD9;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #ccc;z-index:999;">
     <a href="index.html" class="nav-item" data-en="Home" data-gu="હોમ">Home</a>
@@ -152,7 +167,7 @@
             <p><em>By ${p.author} • ${new Date(p.createdAt).toLocaleDateString()}</em></p>
             <div class="post-content" id="post-${p._id}">
               <button class="collapse-btn" onclick="togglePost('${p._id}')">−</button>
-              <p>${p.body}</p>
+              <div class="post-markdown">${marked.parse(p.body)}</div>
               <section class="comment-section">
                 <h3>💬 Comments</h3><br>
                 <div id="comments-${p._id}">Loading comments…</div>
@@ -282,5 +297,4 @@
     fetchPosts();
   });
   </script>
-</body>
-</html>
+  

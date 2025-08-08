@@ -7,7 +7,8 @@
 
 body {
   font-family: Arial, sans-serif;
-  opacity: 1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
   background-color: #FEFBE7;
   color: #7D615B;
 }
@@ -312,48 +313,3 @@ body.fade-out {
   font-weight: bold;
 }
 
-#post-details {
-  display: block;
-  min-height: 100px;
-  background-color: #fff;
-  color: #000;
-  font-size: 1.2rem;
-  font-family: Arial, sans-serif;
-  padding: 1rem;
-  line-height: 1.6;
-  border: 1px solid #ddd;
-  margin-top: 1rem;
-}
-
-     
-    body {
-      background-color: #FEFBE7;
-      font-family: Arial, sans-serif;
-      color: #7D615B;
-      margin: 0;
-      padding: 0;
-    }
-    .admin-box {
-      max-width: 800px;
-      margin: 15vh auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .admin-box h2 {
-      margin-bottom: 1rem;
-    }
-    .comment-item {
-      border-left: 2px solid #ddd;
-      padding-left: 1rem;
-      margin-bottom: 1rem;
-    }
-    .comment-actions button {
-      margin-right: 0.5rem;
-    }
-    .comment-item {
-      margin-bottom: 1rem;
-      padding-left: 0.5rem;
-      border-left: 2px solid #ccc;
-  }

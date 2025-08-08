@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Rama Rachna – PDF Viewer</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Fill the space beneath header/nav */
+    #pdf-frame {
+      width: 100%;
+      height: calc(100vh - 60px - 40px); /* adjust if header/nav heights differ */
+      border: none;
+    }
+    main { padding: 1rem; }
+  </style>
+</head>
+<body class="fade-in">
+  <!-- reuse your site header/nav -->
+  <header>
+    <div class="branding">
+      <img src="assets/rama rachna.png" alt="Rama Rachna Logo">
+      <h1 data-en="Rama Rachna" data-gu="રમા રચના">Rama Rachna</h1>
+    </div>
+    <div class="toggle-switch">
+      <input type="checkbox" id="lang-toggle">
+      <label for="lang-toggle" class="toggle-slider"></label>
+    </div>
+  </header>
+  <nav>
+    <a href="index.html" class="nav-item" data-en="Home" data-gu="હોમ">Home</a>
+    <a href="author-pub.html" class="nav-item" data-en="Publications" data-gu="પ્રકાશનો અનુક્રમણિકા">Publications</a>
+    <a href="about.html" class="nav-item" data-en="About" data-gu="વિશે">About</a>
+    <a href="photo-gallery.html" class="nav-item" data-en="Gallery" data-gu="ગેલેરી">Gallery</a>
+    <a href="blog.html" class="nav-item" data-en="Blog" data-gu="બ્લોગ">Blog</a>
+  </nav>
+
+  <main>
+    <iframe id="pdf-frame" src="" title="PDF Viewer">
+      <p>Your browser doesn’t support iframes. 
+         <a id="pdf-link" href="">Download PDF</a>
+      </p>
+    </iframe>
+  </main>
+
+  <script>
+    // language toggle & fade-in copied from app.js (if needed)
+    // … you can import your existing js/app.js via <script src="js/app.js"></script> here …
+
+    // Load the PDF file specified in the query string
+    const params = new URLSearchParams(window.location.search);
+    const file = params.get('file');
+    if (file) {
+      document.getElementById('pdf-frame').src  = file;
+      document.getElementById('pdf-link').href = file;
+    } else {
+      document.querySelector('main').innerHTML = 
+        '<p style="color:#900; padding:2rem;">No document specified. Please go back and click a PDF link.</p>';
+    }
+  </script>
+</body>
+</html>
