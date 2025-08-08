@@ -297,4 +297,17 @@
     fetchPosts();
   });
   </script>
+
+  <script>
+(function () {
+  const current = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('nav .nav-item').forEach(a => {
+    if (a.getAttribute('href') === current) {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    }
+  });
+})();
+</script>
+
   

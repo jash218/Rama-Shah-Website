@@ -95,3 +95,11 @@ section.bio p {
     margin: 0.5rem;
   }
 }
+
+/* Active page highlight */
+.nav-item.active,
+.nav-item[aria-current="page"] {
+  color: #A0522D;
+  border-bottom: 3px solid #A0522D;
+  padding-bottom: 2px;            /* keeps height steady */
+}
