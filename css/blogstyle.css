@@ -1,0 +1,105 @@
+/* Global Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: Arial, sans-serif;
+  background-color: #FEFBE7;
+  color: #7D615B;
+  line-height: 1.6;
+}
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 10vh;
+  background: #FDF6E1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  z-index: 1000;
+  border-bottom: 1px solid #ccc;
+}
+header .branding img {
+  height: 40px;
+}
+nav {
+  position: fixed;
+  top: 10vh;
+  width: 100%;
+  height: 5vh;
+  background: #F8EDD9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.nav-item {
+  margin: 0 1rem;
+  color: #7D615B;
+  font-weight: bold;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.nav-item:hover {
+  color: #A0522D;
+}
+
+/* Container */
+.container {
+  max-width: 900px;
+  margin: 15vh auto 2rem;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Bio Section */
+section.bio h2,
+section.bio h3 {
+  color: #7D615B;
+  margin-bottom: 1rem;
+}
+section.bio p {
+  margin: 1rem 0;
+  color: #555;
+}
+.bio-photo {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+.bio-photo img {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    margin: 20vh 1rem 1rem;
+    padding: 1.5rem;
+  }
+  nav {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 0.5rem;
+  }
+  .nav-item {
+    margin: 0.5rem;
+  }
+}
+
+/* Active page highlight */
+.nav-item.active,
+.nav-item[aria-current="page"] {
+  color: #A0522D;
+  border-bottom: 3px solid #A0522D;
+  padding-bottom: 2px;            /* keeps height steady */
+}

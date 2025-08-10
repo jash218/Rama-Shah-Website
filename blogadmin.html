@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blog Admin Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- 1) include marked.js before our script -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>marked.setOptions({ breaks: true });</script>
+
+  <!-- Markdown spacing overrides -->
+  <style>
+    .post-markdown p {
+      margin: 1rem 0 !important;
+      line-height: 1.6 !important;
+    }
+    .post-markdown br {
+      display: block !important;
+      margin-bottom: 1rem !important;
+    }
+  </style>
+
+</head>
+<body style="opacity:0; transition: opacity .3s ease;">
+  <main style="max-width:800px; margin:2rem auto; padding:1rem; background:#fff; border-radius:8px;">
+    <h2>Blog Admin Dashboard</h2>
+    <p>Welcome, <strong id="admin-name"></strong> 👋</p>
+    <div><button onclick="logout()">Logout</button></div>
+    <hr />
+
+    <!-- Post Selector & Delete/New Post Buttons -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <div>
+        <label for="post-selector"><strong>📚 Select Post:</strong></label>
+        <select id="post-selector" onchange="switchPost(this.value)">
+          <option disabled selected>Loading...</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <!-- DELETE button -->
+        <button onclick="deletePost()"
+                style="background:#A14E47; color:white; border:none; padding:0.5rem 1rem; border-radius:5px;">
+          🗑️ Delete Post
+        </button>
+        <!-- NEW button -->
+        <button onclick="togglePostForm()"
+                style="background:#7D615B; color:white; border:none; padding:0.5rem 1rem; border-radius:5px;">
+          ➕ New Post
+        </button>
+      </div>
+    </div>
+
+    <!-- New Post Form -->
+    <div id="new-post-form" style="display:none; margin-bottom:2rem;">
+      <h3>Create New Post</h3>
+      <input id="new-title"    placeholder="Title"  style="width:100%; padding:.5rem; margin-bottom:.5rem;"/>
+      <textarea id="new-body"   placeholder="Body (Markdown supported)"   rows="6"
+                style="width:100%; padding:.5rem; margin-bottom:.5rem;"></textarea>
+      <input id="new-author"   placeholder="Author" style="width:100%; padding:.5rem; margin-bottom:.5rem;"/>
+      <button onclick="submitNewPost()" style="background:#4A735E; color:white; border:none; padding:.5rem 1rem; border-radius:5px;">
+        Publish
+      </button>
+    </div>
+
+    <!-- Post Details (with Markdown preview) -->
+    <section id="post-details" style="margin-bottom:2rem;">
+      Loading post…
+    </section>
+
+    <!-- Comments -->
+    <section>
+      <h3>Comments</h3>
+      <div id="comments-section">Loading...</div>
+    </section>
+  </main>
+
+  <script>
+    // Fade-in & Auth check
+    document.body.style.opacity = '1';
+    if (localStorage.getItem('isAdmin') !== 'true') {
+      alert("Access denied.");
+      window.location.href = "index.html";
+    }
+    document.getElementById('admin-name').textContent =
+      localStorage.getItem('username') || 'Admin';
+
+    let currentPostId = null;
+    let allPosts = [];
+
+    function togglePostForm() {
+      const form = document.getElementById('new-post-form');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Load & display posts in selector
+    async function loadPosts() {
+      const res = await fetch('http://localhost:3000/api/posts');
+      allPosts = await res.json();
+
+      const selector = document.getElementById('post-selector');
+      selector.innerHTML = '';
+      allPosts.forEach(post => {
+        const opt = document.createElement('option');
+        opt.value = post._id;
+        opt.textContent = post.title;
+        selector.appendChild(opt);
+      });
+
+      // select first post by default
+      if (allPosts.length) {
+        currentPostId = allPosts[0]._id;
+        selector.value = currentPostId;
+        renderPostContent(currentPostId);
+        loadComments(currentPostId);
+      } else {
+        document.getElementById('post-details').innerText = 'No posts available.';
+        document.getElementById('comments-section').innerText = '';
+      }
+    }
+
+    function switchPost(postId) {
+      currentPostId = postId;
+      renderPostContent(postId);
+      loadComments(postId);
+    }
+
+    // 2) Render Markdown instead of raw text
+    function renderPostContent(postId) {
+      const post = allPosts.find(p => p._id === postId);
+      document.getElementById('post-details').innerHTML = `
+        <h3 style="margin-bottom:.25rem;">${post.title}</h3>
+        <p style="font-size:0.9rem; color:#555; margin-top:0;">
+          <em>Post ID: ${post._id}</em>
+        </p>
+        <div class="post-markdown" style="margin:1rem 0;">
+          ${ marked.parse(post.body) }
+        </div>
+        <hr/>
+      `;
+    }
+
+    async function loadComments(postId) {
+      const res = await fetch('http://localhost:3000/api/comments/' + postId);
+      const comments = await res.json();
+      const section = document.getElementById('comments-section');
+      section.innerHTML = '';
+
+      if (!comments.length) {
+        section.innerHTML = '<p>No comments yet.</p>';
+        return;
+      }
+
+      // Group by parentId
+      const commentMap = {};
+      comments.forEach(c => {
+        const key = c.parentId || 'root';
+        (commentMap[key] = commentMap[key] || []).push(c);
+      });
+
+      function renderTree(parentId='root', depth=0) {
+        (commentMap[parentId] || []).forEach(c => {
+          const div = document.createElement('div');
+          div.style.marginLeft = `${depth * 2}rem`;
+          div.innerHTML = `
+            <p><strong>${c.isAuthor ? 'Author ⭐' : c.name}:</strong> ${c.text}</p>
+            <button onclick="reply('${c._id}')">Reply</button>
+            <button onclick="deleteComment('${c._id}')">Delete</button>
+            <div id="reply-box-${c._id}" style="margin-top:.5rem;"></div>
+          `;
+          section.appendChild(div);
+          renderTree(c._id, depth + 1);
+        });
+      }
+
+      renderTree();
+    }
+
+    function reply(commentId) {
+      const box = document.getElementById(`reply-box-${commentId}`);
+      if (box.innerHTML) return;
+      box.innerHTML = `
+        <textarea rows="2" style="width:100%; margin-bottom:.5rem;" placeholder="Author reply..."></textarea>
+        <button onclick="postAdminReply('${commentId}', this)">Post Reply</button>
+      `;
+    }
+
+    async function postAdminReply(parentId, btn) {
+      const text = btn.previousElementSibling.value.trim();
+      if (!text) return alert("Reply cannot be empty");
+      const payload = {
+        postId: currentPostId,
+        parentId,
+        name: "Author",
+        email: "admin@rama.com",
+        text,
+        isAuthor: true
+      };
+      const res = await fetch('http://localhost:3000/api/comments', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        alert("✅ Reply posted");
+        loadComments(currentPostId);
+      } else {
+        alert("❌ Failed to post reply");
+      }
+    }
+
+    function deleteComment(id) {
+      fetch('http://localhost:3000/api/comments/' + id, { method:'DELETE' })
+        .then(() => loadComments(currentPostId))
+        .catch(() => alert("❌ Error deleting comment"));
+    }
+
+    function deletePost() {
+      const id = prompt("Enter the Post ID to delete:");
+      if (!id) return;
+      if (!confirm(`Are you sure you want to delete post ${id} and all its comments?`)) {
+        return;
+      }
+      fetch(`http://localhost:3000/api/posts/${id}`, { method: 'DELETE' })
+      .then(res => {
+        if (res.ok) {
+          alert("🗑️ Post and its comments deleted");
+          loadPosts();
+        } else if (res.status === 404) {
+          alert("❌ Post not found");
+        } else {
+          alert("❌ Failed to delete post");
+        }
+      })
+      .catch(() => alert("❌ Server error"));
+    }
+
+    async function submitNewPost() {
+      const title  = document.getElementById('new-title').value.trim();
+      const body   = document.getElementById('new-body').value.trim();
+      const author = document.getElementById('new-author').value.trim();
+      if (!title || !body || !author) return alert("All fields are required.");
+
+      const res = await fetch('http://localhost:3000/api/posts', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ title, body, author })
+      });
+      if (res.ok) {
+        alert("✅ New post created!");
+        document.getElementById('new-post-form').style.display = 'none';
+        loadPosts();
+      } else {
+        alert("❌ Failed to create post");
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('isAdmin');
+      localStorage.removeItem('username');
+      window.location.href = "index.html";
+    }
+
+    // Initialize
+    loadPosts();
+  </script>
+</body>
+</html>
